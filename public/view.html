@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Details</title>
+</head>
+
+<body>
+    <h1>Appointments Search</h1>
+    <input type="text" id="doctorname" placeholder="Enter Doctor Name">
+    <button onclick="searchDoctor()">Search</button>
+    <div></div>
+    <div class="mt-5 mx-auto w-[80%] bg-white p-6 rounded-lg">
+        <table class="w-full table-auto border-collapse">
+            <thead>
+                <tr>
+                    <th class="border px-10 py-2">ID</th>
+                    <th class="border px-10 py-2">Patient Name</th>
+                    <th class="border px-10 py-2">Doctor Name</th>
+                    <th class="border px-10 py-2">Appointment Date</th>
+                    <th class="border px-10 py-2">Appointment Time</th>
+                    <th class="border px-10 py-2">Update</th>
+                </tr>
+            </thead>
+            <tbody id="doctorDetails" style="margin-top: 50px;">
+                <!-- Tasks will be dynamically loaded here -->
+            </tbody>
+        </table>
+    </div>
+    <script>
+        async function searchDoctor() {
+            const doctor_name = document.getElementById('doctorname').value;
+            const response = await fetch(`/doctorSearch/${doctor_name}`);
+
+            const datas = await response.json();
+            const tasksTable = document.getElementById('doctorDetails');
+
+            console.log(datas)
+            try {
+                datas.forEach(data => {
+                    tasksTable.innerHTML += `
+                        <tr>
+                            <td class="border px-10 py-2"><input type="text" id="token_id" value="${data.token_id}"></td>
+                            <td class="border px-10 py-2"><input type="text" id="patient_name" value="${data.patient_name}"></td>
+                            <td class="border px-10 py-2"><input type="text" id="doctor_name" value="${data.doctor_name}"></td>
+                            <td class="border px-10 py-2"><input type="text" id="appointment_date" value="${data.appointment_date}"></td>
+                            <td class="border px-10 py-2"><input type="text" id="appointment_time" value="${data.appointment_time}"></td>
+                            <td class="border px-10 py-2">
+                    <form ><button onclick="updateDetails()">Update</button></form>
+                    <form ><button onclick="deleteDetails()">Delete</button></form>
+
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+            catch (error) {
+                console.log(error)
+            }
+
+        }
+        // document.addEventListener('DOMContentLoaded', updateDetails);
+        async function updateDetails() {
+
+const token_id = document.getElementById('token_id').value;
+const patient_name = document.getElementById('patient_name').value;
+const doctor_name = document.getElementById('doctor_name').value;
+const appointment_date = document.getElementById('appointment_date').value;
+const appointment_time = document.getElementById('appointment_time').value;
+
+const response = await fetch(`/update`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token_id, patient_name, doctor_name,appointment_date,appointment_time })
+});
+console.log(response)
+if (response.ok) {
+alert("Successfully Updated")  
+} else {
+    const error = await response.text();
+alert("Something Went Wrong..")            }
+
+}
+async function deleteDetails() {
+
+const token_id = document.getElementById('token_id').value;
+
+
+const response = await fetch(`/delete/${token_id}`, {
+    method: 'DELETE',
+   
+});
+console.log(response)
+if (response.ok) {
+alert("Successfully DELETED")  
+} else {
+    const error = await response.text();
+alert("Something Went Wrong..")            }
+
+}     // document.addEventListener('DOMContentLoaded', searchDoctor);
+
+    </script>
+</body>
+
+</html>
